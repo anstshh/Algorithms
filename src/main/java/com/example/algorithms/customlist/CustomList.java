@@ -5,8 +5,6 @@ public interface CustomList {
     // в качестве результата выполнения.
     Integer add(Integer item);
 
-    String add(String item);
-
     // Добавление элемента
     // на определенную позицию списка.
     // Если выходит за пределы фактического
@@ -16,8 +14,6 @@ public interface CustomList {
     // в качестве результата выполнения.
     Integer add(int index, Integer item);
 
-    String add(int index, String item);
-
     // Установить элемент
     // на определенную позицию,
     // затерев существующий.
@@ -26,8 +22,6 @@ public interface CustomList {
     // фактического количества элементов
     // или выходит за пределы массива.
     Integer set(int index, Integer item);
-
-    String set(int index, String item);
 
     // Удаление элемента.
     // Вернуть удаленный элемент
@@ -55,19 +49,11 @@ public interface CustomList {
     // или -1 в случае отсутствия.
     int lastIndexOf(Integer item);
 
-    String remove(String item);
-
-    boolean contains(String item);
-
-    int indexOf(String item);
-
-    int lastIndexOf(String item);
-
     // Получить элемент по индексу.
     // Вернуть элемент или исключение,
     // если выходит за рамки фактического
     // количества элементов.
-    String get(int index);
+    Integer get(int index);
 
     // Сравнить текущий список с другим.
     // Вернуть true/false или исключение,
@@ -88,5 +74,5 @@ public interface CustomList {
     // Создать новый массив
     // из строк в списке
     // и вернуть его.
-    String[] toArray();
+    Integer[] toArray();
 }

@@ -3,128 +3,84 @@ package com.example.algorithms.customlist;
 import java.util.Arrays;
 
 public class CustomListImpl implements CustomList {
-
-    private final String[] storage;
-    private int size;
+    private Integer[] array;
 
     public CustomListImpl() {
-        storage = new String[10];
+        this.array = new Integer[10];
     }
 
-    public CustomListImpl(int intSize) {
-        storage = new String[intSize];
-    }
+    private int size = 0;
 
     @Override
     public Integer add(Integer item) {
-        return null;
-    }
-
-    @Override
-    public String add(String item) {
-        validateSize();
         validateItem(item);
-        storage[size++] = item;
+        if (size == array.length) {
+            grow();
+        }
+        array[size] = item;
+        size++;
         return item;
     }
 
     @Override
     public Integer add(int index, Integer item) {
-        return null;
-    }
-
-    @Override
-    public String add(int index, String item) {
-        validateSize();
-        validateItem(item);
         validateIndex(index);
-
-        if (index == size) {
-            storage[size++] = item;
-            return item;
+        validateItem(item);
+        if (size == array.length) {
+            grow();
         }
-        System.arraycopy(storage,index,storage,index+1,size-index);
-        storage[index] = item;
+        System.arraycopy(array, index, array, index + 1, array.length - index);
+        array[index] = item;
         size++;
         return item;
     }
 
     @Override
     public Integer set(int index, Integer item) {
-        return null;
-    }
-
-    @Override
-    public String set(int index, String item) {
         validateIndex(index);
-        validateItem(String.valueOf(item));
-        storage[index] = String.valueOf(item);
+        validateItem(item);
+        array[index] = item;
         return item;
     }
 
     @Override
     public Integer remove(Integer item) {
-        return null;
+        validateItem(item);
+
+        int index = indexOf(item);
+
+        return remove(index);
     }
 
-
     @Override
-    public String remove(String item) {
-        validateItem(item);
-        int index = indexOf(item);
-        if(index == -1) {
-            throw new ElementNotFoundException();
+    public Integer remove(int index) {
+        validateIndex(index);
+
+        Integer item = array[index];
+
+        if (index != size) {
+            System.arraycopy(array, index + 1, array, index, array.length - index);
         }
-        if(index == size) {
-            storage[size--] = null;
-            return item;
-        }
-        System.arraycopy(storage,index+1,storage,index,size-index);
         size--;
         return item;
     }
 
     @Override
-    public Integer remove(int index) {
-        if(index==-1) {
-            throw new ElementNotFoundException();
-        }
-        if(index != size) {
-            System.arraycopy(storage, index + 1, storage, index, size - index);
-        }
-            size--;
-            return index;
-    }
-
-    @Override
     public boolean contains(Integer item) {
-        return false;
+        Integer[] copy = toArray();
+        quickSort(copy,0,copy.length-1);
+        return binarySearch(copy, item);
     }
 
     @Override
     public int indexOf(Integer item) {
-        return 0;
+        return Arrays.binarySearch(array, item);
     }
 
     @Override
     public int lastIndexOf(Integer item) {
-        return 0;
-    }
-
-    @Override
-    public boolean contains(String item) {
-        return indexOf(item) != -1;
-    }
-
-    @Override
-    public int indexOf(String item) {
-        return Arrays.binarySearch(storage, item);
-    }
-
-    @Override
-    public int lastIndexOf(String item) {
         for (int i = size - 1; i >= 0; i--) {
-            if (storage[i].equals(item)) {
+            if (array[i].equals(item)) {
                 return i;
             }
         }
@@ -132,9 +88,9 @@ public class CustomListImpl implements CustomList {
     }
 
     @Override
-    public String get(int index) {
+    public Integer get(int index) {
         validateIndex(index);
-        return storage[index];
+        return array[index];
     }
 
     @Override
@@ -158,21 +114,71 @@ public class CustomListImpl implements CustomList {
     }
 
     @Override
-    public String[] toArray() {
-        return Arrays.copyOf(storage, size);
+    public Integer[] toArray() {
+        return Arrays.copyOf(array, size);
     }
 
-    private void validateItem (String item) {
-        if (item == null)
-            throw new NullItemException();
-    }
-    private void validateSize() {
-        if (size == storage.length) {
-            throw new StorageIsFullException();
+
+    private void validateIndex(int index) {
+        if (index >= size || index < 0) {
+            throw new CustomIndexException();
         }
     }
-        private void validateIndex(int index) {
-            if(index < 0 || index > size)
-                throw new InvalidIndexException();
+
+    private void validateItem(Integer item) {
+        if (item == null) {
+            throw new CustomNullException();
         }
+    }
+
+    private void quickSort(Integer[] arr, int begin, int end) {
+        if (begin < end) {
+            int partitionIndex = partition(arr, begin, end);
+
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
+        }
+    }
+
+    private int partition(Integer[] arr, int begin, int end) {
+        int pivot = arr[end];
+        int i = (begin - 1);
+
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElements(arr, i, j);
+            }
+        }
+
+        swapElements(arr, i + 1, end);
+        return i + 1;
+    }
+    private void swapElements(Integer[] arr, int left, int right) {
+        int temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
+    }
+
+    private boolean binarySearch(Integer[] arr, int element) {
+        int min = 0;
+        int max = arr.length - 1;
+        while (min <= max) {
+            int mid = (min + max) / 2;
+            if (arr[mid] == element) {
+                return true;
+            }
+            if (element < arr[mid]) {
+                max = mid - 1;
+            } else {
+                min = mid + 1;
+            }
+        }
+        return false;
+    }
+
+    private void grow(){
+        array = Arrays.copyOf(array, (int) (array.length * 1.5 + 1));
+    }
 }
